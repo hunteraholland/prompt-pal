@@ -46,7 +46,7 @@ impl FileInfo {
         let mut buffer = vec![0; preview_length];
         let bytes_read = file.read(&mut buffer)?;
         buffer.truncate(bytes_read);
-        
+
         // Try to convert to UTF-8, fall back to displaying as hex if invalid
         String::from_utf8(buffer.clone())
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid UTF-8"))
@@ -74,7 +74,7 @@ pub fn gather_file_info(
     preview_length: usize,
 ) -> io::Result<Vec<FileInfo>> {
     let paths = crate::walkdir::scan_directory(target_dir.as_ref().to_path_buf())?;
-    
+
     let mut file_infos = Vec::new();
     for path in paths {
         match FileInfo::new(&path, preview_length) {
@@ -82,6 +82,6 @@ pub fn gather_file_info(
             Err(e) => eprintln!("Error processing {}: {}", path.display(), e),
         }
     }
-    
+
     Ok(file_infos)
-} 
+}
