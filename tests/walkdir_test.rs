@@ -17,7 +17,7 @@ fn test_directory_scanning_integration() -> io::Result<()> {
     let nested_dir = temp_path.join("nested");
     fs::create_dir(&nested_dir)?;
     File::create(nested_dir.join("nested1.txt"))?;
-    
+
     // Create deep nested structure
     let deep_dir = nested_dir.join("deep");
     fs::create_dir(&deep_dir)?;
@@ -41,4 +41,4 @@ fn test_directory_scanning_integration() -> io::Result<()> {
     assert!(extensions.contains(&"rs".to_string()));
 
     Ok(())
-} 
+}

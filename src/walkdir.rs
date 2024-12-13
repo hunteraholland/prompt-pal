@@ -2,13 +2,13 @@ use std::path::PathBuf;
 use walkdir::WalkDir;
 
 /// Scans a directory and returns a list of all files found.
-/// 
+///
 /// # Arguments
 /// * `target_dir` - The directory path to scan
-/// 
+///
 /// # Returns
 /// * `Vec<PathBuf>` - A vector of paths to all files found
-/// 
+///
 /// # Example
 /// ```rust
 /// use promptpal::scan_directory;
@@ -69,7 +69,7 @@ mod tests {
         // Create some test files
         File::create(temp_path.join("file1.txt"))?;
         File::create(temp_path.join("file2.txt"))?;
-        
+
         // Create a subdirectory with a file
         fs::create_dir(temp_path.join("subdir"))?;
         File::create(temp_path.join("subdir").join("file3.txt"))?;
@@ -92,4 +92,4 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().kind(), std::io::ErrorKind::NotFound);
     }
-} 
+}
