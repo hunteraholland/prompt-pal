@@ -1,4 +1,5 @@
 mod cli;
+mod walkdir;
 
 use clap::Parser;
 use cli::Cli;
