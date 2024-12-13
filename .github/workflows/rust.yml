@@ -1,0 +1,47 @@
+name: Code Quality & Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Format code
+        run: |
+          cargo fmt --all
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git diff --exit-code || (git add . && git commit -m "Apply automatic formatting" && git push)
+      
+      - name: Run Clippy
+        run: cargo clippy -- -D warnings
+        
+      - name: Run tests
+        run: cargo test --verbose

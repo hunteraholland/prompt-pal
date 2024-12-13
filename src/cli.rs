@@ -15,4 +15,4 @@ pub struct Cli {
     /// Turn debugging information on
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub debug: u8,
-} 
+}
