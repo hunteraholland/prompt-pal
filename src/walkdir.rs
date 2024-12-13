@@ -21,6 +21,7 @@ use walkdir::WalkDir;
 /// # Ok(())
 /// # }
 /// ```
+#[allow(dead_code)]
 pub fn scan_directory(target_dir: impl Into<PathBuf>) -> std::io::Result<Vec<PathBuf>> {
     let target_dir = target_dir.into();
     let mut files = Vec::new();
