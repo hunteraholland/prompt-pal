@@ -2,6 +2,7 @@ mod cli;
 mod fileinfo;
 mod tokenizer;
 mod walkdir;
+mod xml;
 
 use clap::Parser;
 use cli::Cli;
@@ -9,6 +10,7 @@ use fileinfo::FileInfo;
 use std::error::Error;
 use tokenizer::count_tokens;
 use walkdir::scan_directory;
+use xml::XmlGenerator;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -39,7 +41,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Generate XML if requested
     if cli.xml {
-        let xml = generate_xml(&results);
+        let xml = XmlGenerator::generate(&results);
         if let Some(output_path) = cli.output {
             std::fs::write(&output_path, xml)?;
             println!("XML output written to: {}", output_path.display());
@@ -49,18 +51,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
-}
-
-fn generate_xml(files: &[FileInfo]) -> String {
-    let mut xml = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<files>\n");
-
-    for file in files {
-        xml.push_str(&format!("  <file>\n"));
-        xml.push_str(&format!("    <path>{}</path>\n", file.path.display()));
-        xml.push_str(&format!("    <size>{}</size>\n", file.size));
-        xml.push_str(&format!("  </file>\n"));
-    }
-
-    xml.push_str("</files>");
-    xml
 }
