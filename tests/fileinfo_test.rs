@@ -15,14 +15,22 @@ fn test_file_info_creation() -> std::io::Result<()> {
     file.write_all(test_content.as_bytes())?;
 
     // Test FileInfo creation with preview
-    let file_info = FileInfo::new(&test_file_path, 5)?;
+    let file_info = FileInfo::with_preview(&test_file_path, 5)?;
     assert_eq!(file_info.size, 13); // Length of "Hello, World!"
-    assert_eq!(file_info.content_preview, Some("Hello".to_string()));
+    assert_eq!(file_info.content, Some("Hello".to_string()));
+    assert!(!file_info.is_content_complete);
 
     // Test FileInfo creation without preview
-    let file_info_no_preview = FileInfo::new(&test_file_path, 0)?;
+    let file_info_no_preview = FileInfo::with_preview(&test_file_path, 0)?;
     assert_eq!(file_info_no_preview.size, 13);
-    assert_eq!(file_info_no_preview.content_preview, None);
+    assert_eq!(file_info_no_preview.content, None);
+    assert!(!file_info_no_preview.is_content_complete);
+
+    // Test full content reading
+    let file_info_full = FileInfo::with_full_content(&test_file_path)?;
+    assert_eq!(file_info_full.size, 13);
+    assert_eq!(file_info_full.content, Some(test_content.to_string()));
+    assert!(file_info_full.is_content_complete);
 
     Ok(())
 }
@@ -50,7 +58,8 @@ fn test_gather_file_info() -> std::io::Result<()> {
     // Verify each file has correct metadata
     for info in file_infos {
         assert!(info.size > 0);
-        assert!(info.content_preview.is_some());
+        assert!(info.content.is_some());
+        assert!(!info.is_content_complete); // Preview mode
         assert!(info.path.exists());
     }
 
@@ -68,10 +77,11 @@ fn test_binary_file_preview() -> std::io::Result<()> {
     file.write_all(&binary_content)?;
 
     // Test FileInfo creation with preview
-    let file_info = FileInfo::new(&test_file_path, 4)?;
+    let file_info = FileInfo::with_preview(&test_file_path, 4)?;
     assert_eq!(file_info.size, 4);
     // Preview should be hex representation
-    assert_eq!(file_info.content_preview, Some("ff 00 fe 12".to_string()));
+    assert_eq!(file_info.content, Some("ff 00 fe 12".to_string()));
+    assert!(file_info.is_content_complete); // Since we read all 4 bytes
 
     Ok(())
 }
