@@ -28,11 +28,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Process each file
     let mut results = Vec::new();
     for file in files.iter() {
-        let file_info = FileInfo::new(file, 0)?;
+        let file_info = if cli.xml {
+            FileInfo::with_full_content(file)? // Full content for XML output
+        } else {
+            FileInfo::with_preview(file, 1024)? // Preview for token counting only
+        };
 
         if cli.tokens {
             let (token_count, _) =
-                count_tokens(&file_info.content_preview.clone().unwrap_or_default(), None);
+                count_tokens(&file_info.content.clone().unwrap_or_default(), None);
             println!("File: {}, Token count: {}", file.display(), token_count);
         }
 
