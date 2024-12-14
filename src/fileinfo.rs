@@ -99,6 +99,7 @@ impl FileInfo {
 ///
 /// # Returns
 /// * `io::Result<Vec<FileInfo>>` - Vector of file information or an error
+#[allow(dead_code)]
 pub fn gather_file_info(
     target_dir: impl AsRef<Path>,
     preview_length: usize,
