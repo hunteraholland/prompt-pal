@@ -98,14 +98,16 @@ impl XmlGenerator {
             if let Some(content) = &file_info.content {
                 let file_type = Self::detect_file_type(&file_info.path);
                 xml.push_str(&format!(
-                    "{}  <content complete=\"{}\" type=\"{}\">\n{}    ```{}\n{}    {}\n{}    ```\n{}  </content>\n",
+                    "{}  <content complete=\"{}\" type=\"{}\">\n{}    <![CDATA[\n",
                     indent,
                     file_info.is_content_complete,
                     file_type,
-                    indent,
-                    file_type,
-                    indent,
-                    Self::escape_xml(content),
+                    indent
+                ));
+                
+                // Add content without indentation
+                xml.push_str(content);
+                xml.push_str(&format!("\n{}    ]]>\n{}  </content>\n",
                     indent,
                     indent
                 ));
