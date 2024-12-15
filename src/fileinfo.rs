@@ -9,51 +9,81 @@ pub struct FileInfo {
     pub path: PathBuf,
     /// Size of the file in bytes
     pub size: u64,
-    /// Optional preview of the file's content (first few bytes)
-    pub content_preview: Option<String>,
+    /// File content (preview or full)
+    pub content: Option<String>,
+    /// Whether the content is complete or just a preview
+    pub is_content_complete: bool,
 }
 
 impl FileInfo {
-    /// Creates a new FileInfo instance from a path
-    ///
-    /// # Arguments
-    /// * `path` - Path to the file to analyze
-    /// * `preview_length` - Number of bytes to read for the content preview (0 for no preview)
-    ///
-    /// # Returns
-    /// * `io::Result<FileInfo>` - File information or an error
-    pub fn new(path: impl AsRef<Path>, preview_length: usize) -> io::Result<Self> {
+    /// Creates a new FileInfo instance with a preview of the content
+    pub fn with_preview(path: impl AsRef<Path>, preview_length: usize) -> io::Result<Self> {
         let path = path.as_ref().to_path_buf();
         let metadata = fs::metadata(&path)?;
         let size = metadata.len();
 
-        let content_preview = if preview_length > 0 {
-            Some(Self::read_preview(&path, preview_length)?)
+        let (content, is_complete) = if preview_length > 0 {
+            let content = Self::read_content(&path, Some(preview_length))?;
+            let is_complete = preview_length >= size as usize;
+            (Some(content), is_complete)
         } else {
-            None
+            (None, false)
         };
 
         Ok(FileInfo {
             path,
             size,
-            content_preview,
+            content,
+            is_content_complete: is_complete,
         })
     }
 
-    /// Reads a preview of the file's content
-    fn read_preview(path: &Path, preview_length: usize) -> io::Result<String> {
-        let mut file = fs::File::open(path)?;
-        let mut buffer = vec![0; preview_length];
-        let bytes_read = file.read(&mut buffer)?;
-        buffer.truncate(bytes_read);
+    /// Creates a new FileInfo instance with the complete file content
+    pub fn with_full_content(path: impl AsRef<Path>) -> io::Result<Self> {
+        let path = path.as_ref().to_path_buf();
+        let metadata = fs::metadata(&path)?;
+        let size = metadata.len();
 
-        // Try to convert to UTF-8, fall back to displaying as hex if invalid
-        String::from_utf8(buffer.clone())
+        let content = Some(Self::read_content(&path, None)?);
+
+        Ok(FileInfo {
+            path,
+            size,
+            content,
+            is_content_complete: true,
+        })
+    }
+
+    /// Reads content from a file, either preview or full
+    fn read_content(path: &Path, max_length: Option<usize>) -> io::Result<String> {
+        let mut file = fs::File::open(path)?;
+        let file_size = file.metadata()?.len() as usize;
+        let read_size = if let Some(max) = max_length {
+            file_size.min(max)
+        } else {
+            file_size
+        };
+
+        let mut buffer = Vec::with_capacity(read_size);
+        let mut chunk = vec![0; 8192]; // 8KB chunks
+
+        while buffer.len() < read_size {
+            let remaining = read_size - buffer.len();
+            let chunk_size = remaining.min(chunk.len());
+            let bytes_read = file.read(&mut chunk[..chunk_size])?;
+            if bytes_read == 0 {
+                break; // EOF
+            }
+            buffer.extend_from_slice(&chunk[..bytes_read]);
+        }
+
+        let buffer_clone = buffer.clone();
+        String::from_utf8(buffer)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid UTF-8"))
             .or_else(|_| {
-                Ok(buffer
+                Ok(buffer_clone
                     .iter()
-                    .take(preview_length)
+                    .take(read_size)
                     .map(|b| format!("{:02x}", b))
                     .collect::<Vec<_>>()
                     .join(" "))
@@ -69,6 +99,7 @@ impl FileInfo {
 ///
 /// # Returns
 /// * `io::Result<Vec<FileInfo>>` - Vector of file information or an error
+#[allow(dead_code)]
 pub fn gather_file_info(
     target_dir: impl AsRef<Path>,
     preview_length: usize,
@@ -77,7 +108,7 @@ pub fn gather_file_info(
 
     let mut file_infos = Vec::new();
     for path in paths {
-        match FileInfo::new(&path, preview_length) {
+        match FileInfo::with_preview(&path, preview_length) {
             Ok(info) => file_infos.push(info),
             Err(e) => eprintln!("Error processing {}: {}", path.display(), e),
         }
