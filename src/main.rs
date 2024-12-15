@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
         let (token_count, _) = count_tokens(&file_info.content.clone().unwrap_or_default(), None);
         if cli.per_file {
-            println!("File: {}, Token count: {}", file.display(), token_count);
+            println!("File: {}, Token count: ~{}", file.display(), token_count);
         }
         total_tokens += token_count;
 
@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // Always display total token count
-    println!("\nTotal tokens across all files: {}", total_tokens);
+    println!("\nApproximate total tokens across all files: ~{}", total_tokens);
 
     // Generate XML if requested
     if cli.xml {
