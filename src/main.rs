@@ -45,7 +45,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // Always display total token count
-    println!("\nApproximate total tokens across all files: ~{}", total_tokens);
+    println!(
+        "\nApproximate total tokens across all files: ~{}",
+        total_tokens
+    );
 
     // Generate XML if requested
     if cli.xml {
