@@ -8,7 +8,7 @@ impl XmlGenerator {
         let mut xml = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<files>\n");
 
         for file in files {
-            xml.push_str(&format!("  <file>\n"));
+            xml.push_str("  <file>\n");
             xml.push_str(&format!("    <path>{}</path>\n", file.path.display()));
             xml.push_str(&format!("    <size>{}</size>\n", file.size));
             if let Some(content) = &file.content {
@@ -21,7 +21,7 @@ impl XmlGenerator {
                     Self::escape_xml(content)
                 ));
             }
-            xml.push_str(&format!("  </file>\n"));
+            xml.push_str("  </file>\n");
         }
 
         xml.push_str("</files>");
