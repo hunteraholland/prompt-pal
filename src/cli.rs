@@ -16,9 +16,9 @@ pub struct Cli {
     #[arg(short, long)]
     pub xml: bool,
 
-    /// Check token count
-    #[arg(short, long)]
-    pub tokens: bool,
+    /// Show per-file token counts (default only shows total)
+    #[arg(short = 'i', long = "per-file")]
+    pub per_file: bool,
 
     /// Output file for results (optional)
     #[arg(short, long, value_name = "FILE")]

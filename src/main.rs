@@ -35,20 +35,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
             FileInfo::with_preview(file, 1024)? // Preview for token counting only
         };
 
-        if cli.tokens {
-            let (token_count, _) =
-                count_tokens(&file_info.content.clone().unwrap_or_default(), None);
+        let (token_count, _) = count_tokens(&file_info.content.clone().unwrap_or_default(), None);
+        if cli.per_file {
             println!("File: {}, Token count: {}", file.display(), token_count);
-            total_tokens += token_count;
         }
+        total_tokens += token_count;
 
         results.push(file_info);
     }
 
-    // Display total token count if tokens flag is enabled
-    if cli.tokens {
-        println!("\nTotal tokens across all files: {}", total_tokens);
-    }
+    // Always display total token count
+    println!("\nTotal tokens across all files: {}", total_tokens);
 
     // Generate XML if requested
     if cli.xml {
