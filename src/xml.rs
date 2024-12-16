@@ -12,9 +12,14 @@ struct FileNode {
 pub struct XmlGenerator;
 
 impl XmlGenerator {
-    pub fn generate(files: &[FileInfo]) -> String {
+    pub fn generate(files: &[FileInfo], instructions: &str) -> String {
         let root = Self::build_tree(files);
         let mut xml = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<files>\n");
+
+        // Add user instructions
+        xml.push_str("  <instructions>\n    <![CDATA[\n");
+        xml.push_str(instructions);
+        xml.push_str("\n    ]]>\n  </instructions>\n\n");
 
         // Generate and add the tree visualization
         let tree_view = Self::generate_tree_view(&root);

@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Generate XML if requested
     if cli.xml {
-        let xml = XmlGenerator::generate(&results);
+        let xml = XmlGenerator::generate(&results, cli.instructions.as_deref().unwrap_or(""));
         if let Some(output_path) = cli.output {
             std::fs::write(&output_path, xml)?;
             println!("XML output written to: {}", output_path.display());

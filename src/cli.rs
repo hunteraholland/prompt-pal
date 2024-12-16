@@ -12,6 +12,10 @@ pub struct Cli {
     #[arg(short, long, value_name = "DIR")]
     pub directory: PathBuf,
 
+    /// Instructions for the prompt
+    #[arg(short = 'n', long, value_name = "INSTRUCTIONS")]
+    pub instructions: Option<String>,
+
     /// Generate XML output
     #[arg(short, long)]
     pub xml: bool,
