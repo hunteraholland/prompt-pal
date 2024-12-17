@@ -31,9 +31,9 @@ promptpal --directory ./prompts
 promptpal --directory ./prompts --tokens
 ```
 
-3. Generate XML output:
+3. Generate XML output with instructions:
 ```bash
-promptpal --directory ./prompts --xml
+promptpal --directory ./prompts --xml --instructions "These files implement the authentication system"
 ```
 
 4. Save XML output to file:
@@ -44,6 +44,7 @@ promptpal --directory ./prompts --xml --output results.xml
 ### Options
 
 - `-d, --directory <DIR>`: Directory to scan for prompt files
+- `-n, --instructions <INSTRUCTIONS>`: Add instructions to the XML output
 - `-t, --tokens`: Count tokens in each file
 - `-x, --xml`: Generate XML output
 - `-o, --output <FILE>`: Save output to file (optional)
@@ -52,6 +53,7 @@ promptpal --directory ./prompts --xml --output results.xml
 ### XML Output Format
 
 The XML output includes:
+- Instructions (if provided)
 - File paths
 - File sizes
 - File contents (complete or preview)
@@ -61,6 +63,11 @@ Example output:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <files>
+  <instructions>
+    <![CDATA[
+    These files contain the core business logic for user authentication.
+    ]]>
+  </instructions>
   <file>
     <path>example.rs</path>
     <size>100</size>
