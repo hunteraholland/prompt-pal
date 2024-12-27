@@ -9,7 +9,7 @@ on:
 jobs:
   semantic_release:
     # 2) Only run if the previous workflow concluded successfully
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} && ${{ github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
 
       # 3) Run the cargo-release command to bump the version
       - name: Run cargo-release
-        run: cargo release patch --no-publish
+        run: cargo release patch --no-publish --execute
         env:
           # The GITHUB_TOKEN is automatically provided by GitHub Actions.
           # cargo-release uses this to create release tags and GitHub Releases.

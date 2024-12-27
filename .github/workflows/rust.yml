@@ -3,6 +3,8 @@ name: Code Quality & Tests
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - '.github/**'
   pull_request:
     branches: [ "main" ]
 
