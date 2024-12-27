@@ -1,20 +1,24 @@
 name: Release Management
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'Cargo.toml'
-      - 'CHANGELOG.md'
+  workflow_dispatch:
 
 jobs:
   release-pr:
+    permissions:
+      id-token: write    # Required for OIDC
+      pull-requests: write # Required for creating PRs
+      contents: write    # Required for managing releases
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Install cargo-release
+        uses: taiki-e/install-action@v1
+        with:
+          tool: cargo-release
           
       - name: Conventional Changelog Action
         uses: TriPSs/conventional-changelog-action@v3
