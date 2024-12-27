@@ -13,6 +13,15 @@ PromptPal is a command-line tool that helps developers create well-structured pr
 
 ## Installation
 
+### Using Homebrew
+
+```bash
+brew tap hunteraholland/prompt-pal
+brew install promptpal
+```
+
+### Building from Source
+
 ```bash
 cargo install --path .
 ```
